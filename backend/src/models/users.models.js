@@ -35,6 +35,12 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "carts",
   },
+  documents: [{ name: String, reference: String }],
+  last_connection: {
+    type: Date,
+    default: null,
+  },
+
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 });

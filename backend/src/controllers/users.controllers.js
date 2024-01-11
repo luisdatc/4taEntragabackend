@@ -142,3 +142,32 @@ export const sendPasswordResetEmail = async (userEmail) => {
 export const getUserByEmail = async (email) => {
   return userModel.findOne({ email });
 };
+
+export const uploadDocument = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { files } = req;
+
+    const user = await userModel.findById(id);
+
+    if (!user) {
+      return res.status(404).send({ message: "Usuario no encontrado" });
+    }
+
+    files.forEach((file) => {
+      user.documents.push({
+        name: file.originalname,
+        reference: `uploads/documents/${file.filename}`,
+      });
+    });
+
+    await user.save();
+
+    res.status(200).json({ message: "Documentos subidos con éxito" });
+  } catch (error) {
+    console.error("Error al subir documentos:", error);
+    res
+      .status(500)
+      .send({ message: "Error interno del servidor", error: error.message });
+  }
+};

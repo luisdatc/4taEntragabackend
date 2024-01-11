@@ -65,14 +65,6 @@ initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
-//verifico si el usuario es administrador o no
-/* const auth = (req, res, next) => {
-  if (req.session.login === true) {
-    next(); // Continuar con la siguiente ejecución
-  } else {
-    res.redirect("/api/sessions/login");
-  }
-}; */
 
 app.set("views", path.resolve(__dirname, "./views")); //resuelve rutas absolutas a travez de rutas relativas
 app.use("/static", express.static(path.join(__dirname, "/public")));

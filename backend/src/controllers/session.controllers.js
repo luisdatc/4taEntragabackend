@@ -3,30 +3,18 @@ import { generateToken, authToken } from "../utils/jwt.js";
 export const postLogin = async (req, res) => {
   try {
     if (!req.user) {
-      return res.status(401).send({ mensaje: "Usuario invalido" });
+      return res.status(401).send({ mensaje: "Usuario inválido" });
     }
 
-    /*     Si se sigue con sesiones en base de datos esto no se borra, si se usa JWT si se borra  */
+    // Actualiza last_connection al momento del login
+    req.user.last_connection = new Date();
+    await req.user.save();
 
-    /*req.session.user = {
-      first_name: req.user.first_name,
-      last_name: req.user.last_name,
-      age: req.user.age,
-      email: req.user.email,
-      res.status(200).send({mensaje: Usuario Logeado})
-    };*/
-
-    const token = generateToken(
-      req.user
-    ); /* esto para trabajar la sesion con jwt */
-
-    /*     res.cookie("jwtCookie", token, {
-      maxAge: 43200000, //12horas en ms
-    }); */
+    const token = generateToken(req.user);
 
     res.status(200).send({ token });
   } catch (error) {
-    res.status(500).send({ mensaje: `Error al iniciar sesion ${error}` });
+    res.status(500).send({ mensaje: `Error al iniciar sesión ${error}` });
   }
 };
 
@@ -52,6 +40,14 @@ export const getGihubCallback = async (req, res) => {
 };
 
 export const getLogout = async (req, res) => {
-  res.clearCookie("jwtCookie");
-  res.status(200).send({ resultado: "Usuario deslogueado" });
+  try {
+    // Actualiza last_connection al momento del logout
+    req.user.last_connection = new Date();
+    await req.user.save();
+
+    res.clearCookie("jwtCookie");
+    res.status(200).send({ resultado: "Usuario deslogueado" });
+  } catch (error) {
+    res.status(500).send({ mensaje: `Error al desloguear usuario ${error}` });
+  }
 };
